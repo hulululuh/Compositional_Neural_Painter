@@ -5,6 +5,7 @@ from PIL import Image
 import torch.nn as nn
 import morphology
 import torch.nn.functional as F
+
 def normal(x, width):
     return (int)(x * (width - 1) + 0.5)
 
@@ -70,7 +71,7 @@ def draw_oil(param, size=128):
     grid = torch.nn.functional.affine_grid(warp, torch.Size((b, 3, H, W)), align_corners=False)
     brush = torch.nn.functional.grid_sample(brush, grid, align_corners=False)
     alphas = torch.nn.functional.grid_sample(alphas, grid, align_corners=False)
-    brush=morphology.dilation(brush)
+    brush = morphology.dilation(brush)
     #brush = morphology.erosion(brush)
     # print(brush[0].mean(),brush[-1].mean())
     # print(param[0,-1],param[-1,-1])
@@ -174,5 +175,5 @@ def draw_oil_edge(param, size=128):
     edge = conv(alphas)
     edge = (edge > 0.2).float()
     #return torch.cat([1-alphas,1-torch.clamp(morphology.erosion(alphas), 0, 1),1-torch.clamp(morphology.erosion(morphology.erosion(alphas)), 0, 1)],dim=1)
-    return torch.cat([1 - brush, 1 - alphas,1-edge], dim=1)
+    return torch.cat([1-brush, 1-alphas, 1-edge], dim=1)
     # return brush, alphas
